@@ -27,8 +27,8 @@ asdf install
 
 ### Commands
 
+#### V1 - Build from legacy yaml
 ```
-# V1 - Build from legacy yaml
 
 kubectl apply -f legacy-yaml/prom.yaml legacy-yaml/grafana.yaml
 kubectl port-forward deployments/grafana 8080:3000
@@ -38,5 +38,12 @@ kubectl port-forward deployments/grafana 8080:3000
 ## Hit Save & Test which should yield a big green bar telling you everything is good.
 
 kubectl delete -f legacy-yaml/prom.yaml -f legacy-yaml/grafana.yaml
+```
 
+#### V2 - Build from single parameterized main.jsonnet
+```
+kubectl create ns cool-namespace
+
+tk diff environments/default
+tk apply environments/default
 ```
