@@ -1,7 +1,7 @@
 {
   // Grafana
   grafana: {
-    deployment: $.k.deployment.new('grafana', [{
+    deployment: $.k.deployment.new($._config.grafana.name, [{
       image: '%s/%s' % [$._config.grafana.name, $._config.grafana.name],
       name: $._config.grafana.name,
       ports: [{
@@ -10,26 +10,10 @@
       }]
     }]),
 
-    service: {
-      apiVersion: 'v1',
-      kind: 'Service',
-      metadata: {
-        labels: {
-          name: $._config.grafana.name,
-        },
-        name: $._config.grafana.name,
-      },
-      spec: {
-        ports: [{
-            name: '%s-ui' % $._config.grafana.name, // printf-style formatting
-            port: $._config.grafana.port,
-            targetPort: $._config.grafana.port,
-        }],
-        selector: {
-          name: $._config.grafana.name,
-        },
-        type: 'NodePort',
-      },
-    },
+    service: $.k.service.new($._config.grafana.name, [{
+      name: '%s-ui' % $._config.grafana.name, // printf-style formatting
+      port: $._config.grafana.port,
+      targetPort: $._config.grafana.port,
+    }])
   }
 }

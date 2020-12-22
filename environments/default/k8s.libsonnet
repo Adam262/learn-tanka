@@ -21,6 +21,25 @@
           }
         }
       }
+    },
+    service: {
+      new(name, ports): {
+        apiVersion: 'v1',
+        kind: 'Service',
+        metadata: {
+          labels: {
+            name: name,
+          },
+          name: name,
+        },
+        spec: {
+          ports: ports,
+          selector: {
+            name: name,
+          },
+          type: 'NodePort',
+        },
+      },
     }
   }
 }
