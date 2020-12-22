@@ -1,3 +1,9 @@
+// This code works even though grafana.jsonnet + prom.jsonnet refers to the root object $ from outside its scope.
+// This is bc Jsonnet is lazy-evaluated
+// That is, grafana.jsonnet + prom.jsonnet are first "copied" into main.jsonnet (the root object) and then evaluated.
+// So this code consists of all three objects joined to one big object, which is then converted to JSON.
+(import "grafana.jsonnet") +
+(import "prom.jsonnet") +
 {
   _config:: { // :: is a private key that will appear in compiled json 
     grafana: {
@@ -8,128 +14,6 @@
       port: 9090,
       name: "prometheus"
     }
-  },
-  // Grafana
-  grafana: {
-    deployment: {
-      apiVersion: 'apps/v1',
-      kind: 'Deployment',
-      metadata: {
-        name: $._config.grafana.name,
-      },
-      spec: {
-        selector: {
-          matchLabels: {
-            name: $._config.grafana.name,
-          },
-        },
-        template: {
-          metadata: {
-            labels: {
-              name: $._config.grafana.name,
-            },
-          },
-          spec: {
-            containers: [
-              {
-                image: '%s/%s' % [$._config.grafana.name, $._config.grafana.name],
-                name: $._config.grafana.name,
-                ports: [{
-                    containerPort: $._config.grafana.port,
-                    name: 'ui',
-                }],
-              },
-            ],
-          },
-        },
-      },
-    },
-    service: {
-      apiVersion: 'v1',
-      kind: 'Service',
-      metadata: {
-        labels: {
-          name: $._config.grafana.name,
-        },
-        name: $._config.grafana.name,
-      },
-      spec: {
-        ports: [{
-            name: '%s-ui' % $._config.grafana.name, // printf-style formatting
-            port: $._config.grafana.port,
-            targetPort: $._config.grafana.port,
-        }],
-        selector: {
-          name: $._config.grafana.name,
-        },
-        type: 'NodePort',
-      },
-    },
-  },
-
-  // Prometheus
-  prometheus: {
-    deployment: {
-      apiVersion: 'apps/v1',
-      kind: 'Deployment',
-      metadata: {
-        name: $._config.prometheus.name,
-      },
-      spec: {
-        minReadySeconds: 10,
-        replicas: 1,
-        revisionHistoryLimit: 10,
-        selector: {
-          matchLabels: {
-            name: $._config.prometheus.name,
-          },
-        },
-        template: {
-          metadata: {
-            labels: {
-              name: $._config.prometheus.name,
-            },
-          },
-          spec: {
-            containers: [
-              {
-                image: 'prom/%s' % $._config.prometheus.name,
-                imagePullPolicy: 'IfNotPresent',
-                name: $._config.prometheus.name,
-                ports: [
-                  {
-                    containerPort: $._config.prometheus.port,
-                    name: 'api',
-                  },
-                ],
-              },
-            ],
-          },
-        },
-      },
-    },
-    service: {
-      apiVersion: 'v1',
-      kind: 'Service',
-      metadata: {
-        labels: {
-          name: $._config.prometheus.name,
-        },
-        name: $._config.prometheus.name,
-      },
-      spec: {
-        ports: [
-          {
-            name: '%s-api' % $._config.prometheus.name,
-            port: $._config.prometheus.port,
-            targetPort: $._config.prometheus.port,
-          },
-        ],
-        selector: {
-          name: $._config.prometheus.name,
-        },
-      },
-    },
   },
 
   // Namespace
