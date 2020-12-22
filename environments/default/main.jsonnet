@@ -4,6 +4,7 @@
 // So this code consists of all three objects joined to one big object, which is then converted to JSON.
 (import "grafana.jsonnet") +
 (import "prom.jsonnet") +
+(import "k8s.libsonnet") +
 {
   _config:: { // :: is a private key that will appear in compiled json 
     grafana: {
