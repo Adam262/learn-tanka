@@ -1,15 +1,18 @@
-/* 
-  This code works even though the imported files refer to the root object $ from outside its scope. 
-  This is bc Jsonnet is lazy-evaluated. 
-  That is, the imported files are first "copied" into main.jsonnet (the root object) and then evaluated. 
-  So this code consists of all three objects joined to one big object, which is then converted to JSON.
+/*
+  Jsonnet is lazy-evaluated.
+  That is, the imported files are first "copied" into main.jsonnet (the root object) and then converted to JSON.
 */
 
-(import "grafana.jsonnet") +
-(import "prom.jsonnet") +
-(import "k8s.libsonnet") +
+(import "github.com/grafana/jsonnet-libs/ksonnet-util/kausal.libsonnet") +
+
 {
-  _config:: { // :: is a private key that will appear in compiled json 
+  // Extract only needed parts of ksonnet-util
+  local deploy = $.apps.v1.deployment,
+  local container = $.core.v1.container,
+  local port = $.core.v1.containerPort,
+  local service = $.core.v1.service,
+
+  _config:: { // :: is a private key that will appear in compiled json
     grafana: {
       port: 3000,
       name: "grafana",
@@ -18,6 +21,52 @@
       port: 9090,
       name: "prometheus"
     }
+  },
+
+  // Prometheus
+  prometheus: {
+    deployment: deploy.new(
+      name = $._config.prometheus.name,
+      replicas = 1,
+      containers = [
+        container.new(
+          name = $._config.prometheus.name,
+          image = 'prom/%s' % $._config.prometheus.name
+        )
+        + container.withPorts([
+            port.new(
+              'api',
+              $._config.prometheus.port
+            )
+          ])
+      ]
+    ),
+
+    service: $.util.serviceFor(self.deployment)
+  },
+
+  // Grafana
+  grafana: {
+    deployment: deploy.new(
+      name = $._config.grafana.name,
+      replicas = 1,
+      containers = [
+        container.new(
+          name = $._config.grafana.name,
+          image = '%s/%s' % [$._config.grafana.name, $._config.grafana.name],
+        )
+        + container.withPorts([
+            port.new(
+              'ui',
+              $._config.grafana.port
+            )
+          ])
+      ]
+    ),
+
+    service:
+      $.util.serviceFor(self.deployment)
+      + service.mixin.spec.withType("NodePort"),
   },
 
   // Namespace

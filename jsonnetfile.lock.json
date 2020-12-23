@@ -8,7 +8,8 @@
           "subdir": "ksonnet-util"
         }
       },
-      "version": "master"
+      "version": "81c9c467fc917009162516207247eeb315170b14",
+      "sum": "TGgjbv8oGfmMNjfvcgxi2cX9RAJKGZnYGLEhzK2wNjM="
     },
     {
       "source": {
@@ -17,8 +18,9 @@
           "subdir": "ksonnet.beta.4"
         }
       },
-      "version": "master"
+      "version": "0d2f82676817bbf9e4acf6495b2090205f323b9f",
+      "sum": "ur22hPQq0JAPBxm8hNMcwjumj4MkozDwOKiGZvVMYh4="
     }
   ],
-  "legacyImports": true
+  "legacyImports": false
 }

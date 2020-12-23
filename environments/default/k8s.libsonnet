@@ -1,9 +1,9 @@
-/* 
+/*
   .libsonnet is the extension for Jsonnet libraries.
   Use it to dinstinguish helper code from actual configuration.
 */
 
-local deployment_spec(name, containers) = 
+local deployment_spec(name, containers) =
   {
     spec: {
       selector: { matchLabels: {
@@ -14,7 +14,7 @@ local deployment_spec(name, containers) =
           name: name,
         }},
         spec: { containers: containers }
-      }    
+      }
     }
   };
 
@@ -45,9 +45,9 @@ local service_spec_patch(patch) = {
         metadata: {
           name: name,
         }
-      } +
-      deployment_spec(name, containers) +
-      deployment_spec_patch(patch),
+      }
+      + deployment_spec(name, containers)
+      + deployment_spec_patch(patch),
     },
     service: {
       new(name, ports, patch={ type: 'ClusterIP' }): {
@@ -59,9 +59,9 @@ local service_spec_patch(patch) = {
           },
           name: name,
         },
-      } +
-      service_spec(name, ports) +
-      service_spec_patch(patch)
+      }
+      + service_spec(name, ports)
+      + service_spec_patch(patch)
     }
   }
 }
