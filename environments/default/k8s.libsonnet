@@ -5,11 +5,6 @@
 
 local deployment_spec(name, containers) = 
   {
-    apiVersion: "apps/v1",
-    kind: "Deployment",
-    metadata: {
-      name: name,
-    },
     spec: {
       selector: { matchLabels: {
         name: name,
@@ -19,15 +14,27 @@ local deployment_spec(name, containers) =
           name: name,
         }},
         spec: { containers: containers }
-      }
+      }    
     }
   };
 
+// +: syntax will merge old `spec` with patch updated keys only
+local deployment_spec_patch(patch) = {
+  spec+: patch
+};
+
 {
-  k:: {
+  k8s:: {
     deployment: {
-      new(name, containers): 
-        deployment_spec(name, containers)
+      new(name, containers, patch={}): {
+        apiVersion: "apps/v1",
+        kind: "Deployment",
+        metadata: {
+          name: name,
+        }
+      }
+      + deployment_spec(name, containers)
+      + deployment_spec_patch(patch),
     },
     service: {
       new(name, ports): {

@@ -1,13 +1,13 @@
 {
   local patch = {
-    spec+: {
-      minReadySeconds: 10,
-      replicas: 1,
-      revisionHistoryLimit: 10
-    }
+    minReadySeconds: 10,
+    replicas: 1,
+    revisionHistoryLimit: 10
   },
 
-  local deployment = $.k.deployment.new(
+  // Prometheus
+  prometheus: {
+    deployment: $.k8s.deployment.new(
       $._config.prometheus.name,
       [{
         image: 'prom/%s' % $._config.prometheus.name,
@@ -19,12 +19,9 @@
             name: 'api',
           },
         ],
-      }]
+      }],
+      patch
     ),
-
-  // Prometheus
-  prometheus: {
-    deployment: deployment + patch,
 
     service: {
       apiVersion: 'v1',
