@@ -33,14 +33,19 @@
           name = $._config.prometheus.name,
           image = 'prom/%s' % $._config.prometheus.name
         )
-        + container.withPorts([
-            port.new(
-              'api',
-              $._config.prometheus.port
-            )
-          ])
+        + container.
+            withPorts([
+              port.new(
+                'api',
+                $._config.prometheus.port
+              )
+            ]).
+            withImagePullPolicy('IfNotPresent')
       ]
-    ),
+    ).
+      withMinReadySeconds(10).
+      withReplicas(1).
+      withRevisionHistoryLimit(10),
 
     service: $.util.serviceFor(self.deployment)
   },
@@ -55,12 +60,14 @@
           name = $._config.grafana.name,
           image = '%s/%s' % [$._config.grafana.name, $._config.grafana.name],
         )
-        + container.withPorts([
-            port.new(
-              'ui',
-              $._config.grafana.port
-            )
-          ])
+        + container.
+            withPorts([
+              port.new(
+                'ui',
+                $._config.grafana.port
+              )
+            ]).
+            withImagePullPolicy('Always')
       ]
     ),
 
