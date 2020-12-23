@@ -23,6 +23,19 @@ local deployment_spec_patch(patch) = {
   spec+: patch
 };
 
+local service_spec(name, ports) = {
+  spec: {
+    ports: ports,
+    selector: {
+      name: name,
+    },
+  },
+};
+
+local service_spec_patch(patch) = {
+  spec+: patch
+};
+
 {
   k8s:: {
     deployment: {
@@ -32,12 +45,12 @@ local deployment_spec_patch(patch) = {
         metadata: {
           name: name,
         }
-      }
-      + deployment_spec(name, containers)
-      + deployment_spec_patch(patch),
+      } +
+      deployment_spec(name, containers) +
+      deployment_spec_patch(patch),
     },
     service: {
-      new(name, ports): {
+      new(name, ports, patch={ type: 'ClusterIP' }): {
         apiVersion: 'v1',
         kind: 'Service',
         metadata: {
@@ -46,14 +59,9 @@ local deployment_spec_patch(patch) = {
           },
           name: name,
         },
-        spec: {
-          ports: ports,
-          selector: {
-            name: name,
-          },
-          type: 'NodePort',
-        },
-      },
+      } +
+      service_spec(name, ports) +
+      service_spec_patch(patch)
     }
   }
 }

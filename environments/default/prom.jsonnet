@@ -1,10 +1,4 @@
 {
-  local patch = {
-    minReadySeconds: 10,
-    replicas: 1,
-    revisionHistoryLimit: 10
-  },
-
   // Prometheus
   prometheus: {
     deployment: $.k8s.deployment.new(
@@ -20,30 +14,20 @@
           },
         ],
       }],
-      patch
+      {
+        minReadySeconds: 10,
+        replicas: 1,
+        revisionHistoryLimit: 10
+      }
     ),
 
-    service: {
-      apiVersion: 'v1',
-      kind: 'Service',
-      metadata: {
-        labels: {
-          name: $._config.prometheus.name,
-        },
-        name: $._config.prometheus.name,
-      },
-      spec: {
-        ports: [
-          {
-            name: '%s-api' % $._config.prometheus.name,
-            port: $._config.prometheus.port,
-            targetPort: $._config.prometheus.port,
-          },
-        ],
-        selector: {
-          name: $._config.prometheus.name,
-        },
-      },
-    },
-  }
+    service: $.k8s.service.new(
+      $._config.prometheus.name,
+      [{
+        name: '%s-api' % $._config.prometheus.name, // printf-style formatting
+        port: $._config.prometheus.port,
+        targetPort: $._config.prometheus.port,
+      }]
+    )
+  },
 }
