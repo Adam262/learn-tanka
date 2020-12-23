@@ -1,9 +1,9 @@
 # Learning Tanka
 
-### Overview
+## Overview
 This is a tutorial to learn Tanka. It follows the official Tanka [tutorial](https://tanka.dev/)
 
-### Getting Started
+## Getting Started
 Please set up the following dependencies:
 
 * Git clone this repo (run subsequent commands from within repo)
@@ -25,9 +25,9 @@ asdf plugin add kubectl
 asdf install
 ```
 
-### Commands
+## Milestones
 
-#### Build from legacy yaml
+### Build from legacy yaml
 
 ```
 
@@ -41,7 +41,7 @@ kubectl port-forward deployments/grafana 8080:3000
 kubectl delete -f legacy-yaml/prom.yaml -f legacy-yaml/grafana.yaml
 ```
 
-#### Build from jsonnet environment
+### Build from jsonnet default environment
 
 ```
 kubectl create ns cool-namespace
@@ -50,13 +50,15 @@ tk diff environments/default
 tk apply environments/default
 ```
 
-#### Add external packages
+### Add external packages
 
 Install Tanka utility library
 
+```
 jb install github.com/ksonnet/ksonnet-lib/ksonnet.beta.4 github.com/grafana/jsonnet-libs/ksonnet-util
+```
 
-#### Add dev + prod environments
+### Build from dev + prod environments
 
 ```
 kubectl create ns prom-grafana-dev
