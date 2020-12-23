@@ -1,7 +1,10 @@
-// This code works even though grafana.jsonnet + prom.jsonnet refers to the root object $ from outside its scope.
-// This is bc Jsonnet is lazy-evaluated
-// That is, grafana.jsonnet + prom.jsonnet are first "copied" into main.jsonnet (the root object) and then evaluated.
-// So this code consists of all three objects joined to one big object, which is then converted to JSON.
+/* 
+  This code works even though the imported files refer to the root object $ from outside its scope. 
+  This is bc Jsonnet is lazy-evaluated. 
+  That is, the imported files are first "copied" into main.jsonnet (the root object) and then evaluated. 
+  So this code consists of all three objects joined to one big object, which is then converted to JSON.
+*/
+
 (import "grafana.jsonnet") +
 (import "prom.jsonnet") +
 (import "k8s.libsonnet") +

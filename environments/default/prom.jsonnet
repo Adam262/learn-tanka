@@ -1,45 +1,31 @@
 {
+  local patch = {
+    spec+: {
+      minReadySeconds: 10,
+      replicas: 1,
+      revisionHistoryLimit: 10
+    }
+  },
+
+  local deployment = $.k.deployment.new(
+      $._config.prometheus.name,
+      [{
+        image: 'prom/%s' % $._config.prometheus.name,
+        imagePullPolicy: 'IfNotPresent',
+        name: $._config.prometheus.name,
+        ports: [
+          {
+            containerPort: $._config.prometheus.port,
+            name: 'api',
+          },
+        ],
+      }]
+    ),
+
   // Prometheus
   prometheus: {
-    deployment: {
-      apiVersion: 'apps/v1',
-      kind: 'Deployment',
-      metadata: {
-        name: $._config.prometheus.name,
-      },
-      spec: {
-        minReadySeconds: 10,
-        replicas: 1,
-        revisionHistoryLimit: 10,
-        selector: {
-          matchLabels: {
-            name: $._config.prometheus.name,
-          },
-        },
-        template: {
-          metadata: {
-            labels: {
-              name: $._config.prometheus.name,
-            },
-          },
-          spec: {
-            containers: [
-              {
-                image: 'prom/%s' % $._config.prometheus.name,
-                imagePullPolicy: 'IfNotPresent',
-                name: $._config.prometheus.name,
-                ports: [
-                  {
-                    containerPort: $._config.prometheus.port,
-                    name: 'api',
-                  },
-                ],
-              },
-            ],
-          },
-        },
-      },
-    },
+    deployment: deployment + patch,
+
     service: {
       apiVersion: 'v1',
       kind: 'Service',
