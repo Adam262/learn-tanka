@@ -50,9 +50,23 @@ tk diff environments/default
 tk apply environments/default
 ```
 
-### Add external packages
+#### Add external packages
 
 Install Tanka utility library
-```
+
 jb install github.com/ksonnet/ksonnet-lib/ksonnet.beta.4 github.com/grafana/jsonnet-libs/ksonnet-util
+
+#### Add dev + prod environments
+
+```
+kubectl create ns prom-grafana-dev
+kubectl create ns prom-grafana-prod
+
+tk env add environments/prom-grafana/dev --namespace=prom-grafana-dev
+tk env add environments/prom-grafana/prod --namespace=prom-grafana-prod
+
+tk apply environments/prom-grafana/dev
+tk apply environments/prom-grafana/prod
+
+tk show environments/prom-grafana/dev -t deployment/prometheus
 ```
